@@ -1,18 +1,21 @@
-// ignore_for_file: avoid_print
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:time_tracker_app/common_widgets/custom_elevated_button.dart';
+import 'package:time_tracker_app/services/auth.dart';
 
 class SignInPage extends StatelessWidget {
-  const SignInPage({Key? key}) : super(key: key);
+  const SignInPage({Key? key,required this.auth}) : super(key: key);
+
+  final AuthBase auth;
 
   Future<void> _signInAnonymously() async {
-    final userCredential = await FirebaseAuth.instance.signInAnonymously();
-    print(userCredential.user!.uid);
+    try {
+      await auth.signInAnonymously();
+    } catch (e) {
+      print(e.toString());
+    }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
