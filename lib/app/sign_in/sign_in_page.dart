@@ -1,16 +1,23 @@
-
 import 'package:flutter/material.dart';
 import 'package:time_tracker_app/common_widgets/custom_elevated_button.dart';
 import 'package:time_tracker_app/services/auth.dart';
 
 class SignInPage extends StatelessWidget {
-  const SignInPage({Key? key,required this.auth}) : super(key: key);
+  const SignInPage({Key? key, required this.auth}) : super(key: key);
 
   final AuthBase auth;
 
   Future<void> _signInAnonymously() async {
     try {
       await auth.signInAnonymously();
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      await auth.signInWithGoogle();
     } catch (e) {
       print(e.toString());
     }
@@ -54,7 +61,9 @@ class SignInPage extends StatelessWidget {
               ),
               borderRadius: 8.0,
               btnText: "Sign in With Gmail",
-              onpressed: () {},
+              onpressed: () {
+                _signInWithGoogle();
+              },
             ),
             const SizedBox(height: 8.0),
             CustomElevatedButton(

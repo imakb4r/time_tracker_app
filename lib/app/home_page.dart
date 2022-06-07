@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home Page"),
-        //centerTitle: true,
+        centerTitle: true,
         actions: [
           TextButton(
             onPressed: () {
