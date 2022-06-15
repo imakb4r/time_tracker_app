@@ -22,14 +22,15 @@ class LandingPage extends StatelessWidget {
             );
           }
           return HomePage(
-            auth:auth,
+            auth: auth,
+          );
+        } else {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
       },
     );
   }
