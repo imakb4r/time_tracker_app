@@ -21,15 +21,17 @@ class EmailSignInPage extends StatelessWidget {
         ),
         backgroundColor: Colors.indigo,
         centerTitle: true,
-        elevation: 0.0,
+        elevation: 2.0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Card(
-          child: EmailSignInForm(
-            auth: auth,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            child: EmailSignInForm(
+              auth: auth,
+            ),
+            color: Colors.deepPurple[200],
           ),
-          color: Colors.deepPurple[200],
         ),
       ),
       backgroundColor: Colors.deepPurple[100],
