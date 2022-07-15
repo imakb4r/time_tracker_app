@@ -12,7 +12,7 @@ Future<bool?> showAlertDialog(
   if (!Platform.isIOS) {
     return showDialog(
       context: context,
-      barrierColor: Colors.grey[200],
+      //barrierColor: Colors.grey[200],
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: Text(title),

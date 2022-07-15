@@ -1,43 +1,62 @@
+import 'dart:io';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:time_tracker_app/app/sign_in/email_sign_in_page.dart';
 import 'package:time_tracker_app/common_widgets/custom_elevated_button.dart';
+import 'package:time_tracker_app/common_widgets/show_exception_alert_dialog.dart';
 import 'package:time_tracker_app/services/auth.dart';
 
-class SignInPage extends StatelessWidget {
-  const SignInPage({Key? key, required this.auth}) : super(key: key);
+import '../../services/auth_provider.dart';
 
-  final AuthBase auth;
+class SignInPage extends StatefulWidget {
+  @override
+  State<SignInPage> createState() => _SignInPageState();
+}
 
-  Future<void> _signInAnonymously() async {
+class _SignInPageState extends State<SignInPage> {
+  bool _isLoading = false;
+
+  void _showSignInError(BuildContext context, Exception exception) {
+    if (exception is FirebaseException &&
+        exception.code == 'ERROR_ABORTED_BY_USER') {
+      return;
+    }
+    showExceptionAlertDialog(
+      context,
+      title: 'SignIn Failed',
+      exception: exception,
+    );
+  }
+
+  Future<void> _signInAnonymously(BuildContext context) async {
     try {
+      setState(() => _isLoading = true);
+      final auth = AuthProvider.of(context);
       await auth.signInAnonymously();
-    } catch (e) {
-      print(e.toString());
+    } on Exception catch (e) {
+      _showSignInError(context, e);
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
-  Future<void> _signInWithGoogle() async {
+  Future<void> _signInWithGoogle(BuildContext context) async {
     try {
+      setState(() => _isLoading = true);
+      final auth = AuthProvider.of(context);
       await auth.signInWithGoogle();
-    } catch (e) {
-      print(e.toString());
+    } on Exception catch (e) {
+      _showSignInError(context, e);
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
-
-  // Future<void> _signInWithFaceBook() async {
-  //   try {
-  //     await auth.signInWithFacebook();
-  //   } catch (e) {
-  //     print(e.toString());
-  //   }
-  // }
 
   void _signInWithEmail(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => EmailSignInPage(
-          auth: auth,
-        ),
+        builder: (context) => EmailSignInPage(),
         fullscreenDialog: true,
       ),
     );
@@ -46,19 +65,6 @@ class SignInPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Time Tracker",
-          style: TextStyle(
-            fontFamily: "poppins",
-            color: Colors.white,
-            fontSize: 24,
-          ),
-        ),
-        backgroundColor: Colors.purple,
-        centerTitle: true,
-        elevation: 1.5,
-      ),
       body: _buildContent(context),
       backgroundColor: Colors.white,
     );
@@ -71,22 +77,19 @@ class SignInPage extends StatelessWidget {
           gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: <Color>[Colors.purple, Colors.orange])),
+              colors: <Color>[
+            Color.fromARGB(255, 177, 29, 204),
+            Color.fromARGB(255, 95, 10, 230)
+          ])),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Text(
-                'Sign In',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: "poppins",
-                  fontSize: 32,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white70,
-                ),
+              SizedBox(
+                height: 50.0,
+                child: _buildHeader(),
               ),
               const SizedBox(height: 48.0),
               CustomElevatedButton(
@@ -98,20 +101,9 @@ class SignInPage extends StatelessWidget {
                 borderRadius: 8.0,
                 btnText: "Sign in With Gmail",
                 onpressed: () {
-                  _signInWithGoogle();
+                  _signInWithGoogle(context);
                 },
               ),
-              // const SizedBox(height: 8.0),
-              // CustomElevatedButton(
-              //   icon: const Icon(
-              //     Icons.facebook,
-              //     size: 35.0,
-              //     color: Colors.red,
-              //   ),
-              //   borderRadius: 8.0,
-              //   btnText: "Sign in With FaceBook",
-              //   onpressed: _signInWithFaceBook,
-              // ),
               const SizedBox(height: 8.0),
               CustomElevatedButton(
                 icon: const Icon(
@@ -121,7 +113,7 @@ class SignInPage extends StatelessWidget {
                 ),
                 borderRadius: 8.0,
                 btnText: "Sign in With Email",
-                onpressed: () => _signInWithEmail(context),
+                onpressed: () => _isLoading ? null : _signInWithEmail(context),
               ),
               const SizedBox(height: 8.0),
               const Divider(
@@ -147,9 +139,27 @@ class SignInPage extends StatelessWidget {
                 ),
                 borderRadius: 8.0,
                 btnText: "Go Anonymous",
-                onpressed: _signInAnonymously,
+                onpressed: () => _isLoading ? null : _signInAnonymously(context),
               ),
             ]),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    return const Text(
+      'Sign In',
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontFamily: "poppins",
+        fontSize: 32,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
       ),
     );
   }
